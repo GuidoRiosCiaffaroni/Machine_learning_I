@@ -1,0 +1,22 @@
+# Proyecto: Exploración y Propuesta de Problema con Machine Learning no supervisado
+
+ **Objetivo de esta primera etapa**:
+Identificar una fuente de datos confiable y proponer un problema relevante que pueda ser resuelto utilizando técnicas de Machine Learning no supervisado, justificando su importancia y viabilidad.
+
+## Parte 1: Exploración de datasets y problemas
+
+**Paso 1**: Investigar fuentes de datos abiertos
+Explora al menos dos sitios de datasets reconocidos para Deep Learning:
+
+https://www.kaggle.com/datasets
+
+https://huggingface.co/datasets
+
+https://data.gov/ (para datos públicos y gubernamentales)
+
+https://archive.ics.uci.edu/ml/index.php (UCI Machine Learning Repository)
+
+https://paperswithcode.com/datasets
+
+Seleccion de Datos
+https://www.kaggle.com/datasets/emmarex/plantdisease
