@@ -20,3 +20,5 @@ https://paperswithcode.com/datasets
 
 Seleccion de Datos
 https://www.kaggle.com/datasets/emmarex/plantdisease
+
+https://www.kaggle.com/datasets/warcoder/cats-vs-dogs-vs-birds-audio-classification
