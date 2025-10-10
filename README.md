@@ -19,6 +19,18 @@ https://archive.ics.uci.edu/ml/index.php (UCI Machine Learning Repository)
 https://paperswithcode.com/datasets
 
 Seleccion de Datos
+
+Imagenes
+
 https://www.kaggle.com/datasets/emmarex/plantdisease
 
+Audio
+
 https://www.kaggle.com/datasets/warcoder/cats-vs-dogs-vs-birds-audio-classification
+
+CSV
+
+https://www.kaggle.com/code/erimsaholut/student-depression-dataset
+
+https://www.kaggle.com/code/mahdimashayekhi/predicting-disease-risk-from-daily-habits/input
+
