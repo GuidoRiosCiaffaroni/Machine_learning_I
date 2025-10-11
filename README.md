@@ -41,3 +41,7 @@ https://www.kaggle.com/code/mahdimashayekhi/predicting-disease-risk-from-daily-h
 
 https://www.kaggle.com/datasets/athirags/car-data
 
+TXT
+
+https://www.kaggle.com/datasets/tentotheminus9/religious-and-philosophical-texts
+
