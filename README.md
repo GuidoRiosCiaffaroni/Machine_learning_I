@@ -296,3 +296,92 @@ Entrenar autoencoders sobre grandes conjuntos de espectrogramas, hacer clusterin
 
 ### Validación sin etiquetas
 La evaluación del desempeño del clustering es menos directa que en supervisión: no hay ground truth confiable para comparar. Se necesitarán métricas internas de calidad del clustering y validación cualitativa (inspección acústica de muestras representativas de cada cluster).
+
+## https://www.kaggle.com/code/erimsaholut/student-depression-dataset
+
+## 1. Resumen del dataset
+
+El dataset “Student Depression” contiene observaciones de estudiantes con múltiples atributos demográficos, académicos, psicológicos y de estilo de vida, junto con una variable objetivo que indica si el estudiante padece depresión o no. Entre las características se incluyen edad, género, ciudad, promedio académico (CGPA), horas de estudio/trabajo, presión académica, satisfacción con el estudio, estrés financiero, historial familiar de enfermedades mentales, horas de sueño, entre otras . En esencia, es un dataset tabular estructurado con variables numéricas y categóricas, orientado originalmente a tareas de clasificación supervisada de depresión.
+
+## 2. Problemas del mundo real que podrías resolver con aprendizaje no supervisado
+
+Aunque la tarea principal esperada es la clasificación (supervisada), hay maneras interesantes de aplicar aprendizaje no supervisado:
+
+- Segmentación de perfiles estudiantiles: agrupar estudiantes con patrones similares de estrés, hábitos de estudio y bienestar, para identificar subtipos de riesgo o perfiles de vulnerabilidad mental.
+
+- Detección de anomalías o casos atípicos: descubrir registros que se comportan de forma muy distinta al resto (por ejemplo, con combinaciones de variables muy raras) que podrían corresponder a errores en la encuesta, datos mal ingresados o estudiantes con condiciones extremas.
+
+- Reducción de dimensionalidad / preprocesamiento para tareas posteriores: proyectar los datos en un espacio latente más compacto (por ejemplo mediante autoencoders o técnicas de reducción lineal) que puede usarse como insumo para modelos supervisados más simples o para visualización.
+
+- Exploración de correlaciones latentes: usando técnicas como PCA o análisis de componentes independientes para entender combinaciones latentes de variables que expliquen la mayor variabilidad en los datos (por ejemplo, un “factor estrés-académico” latente).
+
+- Agrupamiento para intervención personalizada: si se agrupan estudiantes según similitud de patrones, luego cada grupo puede recibir intervenciones de apoyo mental ajustadas a su perfil (por ejemplo, grupo con alto estrés + bajo sueño, otro con presión financiera alta, etc.).
+
+Estas aplicaciones permitirían a instituciones educativas identificar grupos con necesidades diferenciadas sin depender exclusivamente de etiquetas de diagnóstico.
+
+## 3. Técnicas de aprendizaje no supervisado recomendadas y su justificación
+
+Para un dataset tabular con variables mixtas (numéricas y categóricas), las siguientes técnicas son apropiadas:
+
+- Autoencoders (redes neuronales): especialmente autoencoders densos (fully connected) o variantes que manejen variables mixtas (por ejemplo autoencoders con capas que traten variables categóricas). La capa latente resultante puede servir como “embedding” comprimido del estudiante, capturando patrones complejos no lineales.
+
+- Clustering sobre embeddings: una vez que los embeddings están disponibles, aplicar algoritmos como K-means, GMM (Gaussian Mixture Models) o DBSCAN para agrupar estudiantes con comportamiento similar.
+
+- - K-means es simple y eficiente si se asume un número moderado de grupos.
+
+- - GMM puede capturar clusters con diferentes formas de distribución (no necesariamente esféricos).
+
+- - DBSCAN (o HDBSCAN) permite identificar grupos densos y separar outliers sin necesidad de especificar un número fijo de clusters.
+
+- PCA / t-SNE / UMAP:
+
+- - PCA como técnica inicial para reducción lineal y entender cuánto de la varianza explican las primeras componentes.
+
+- - t-SNE o UMAP para proyectar los datos (o los embeddings) en 2D/3D con preservación de estructura local, lo que facilita la visualización de grupos emergentes o solapamientos entre ellos.
+
+- Clustering jerárquico (aglomerativo o divisivo):
+Trabajar sobre las variables originales o sobre el embedding latente para construir una jerarquía de grupos, lo que puede revelar divisiones progresivas entre perfiles estudiantiles.
+
+- Modelos de mezcla o clustering probabilístico:
+Con GMM o modelos de mezcla más avanzados se obtiene no solo agrupación sino también probabilidades de pertenencia, lo cual puede ser útil para estudiantes que “están entre grupos”.
+
+Justificación técnica:
+
+- Los datos mezclan variables numéricas y categóricas, por lo que directamente aplicar distancia euclídea ignorando esa heterogeneidad podría ser inapropiado; usar embeddings aprendidos o convertir categorías en embeddings mejora la calidad del clustering.
+
+- El uso de autoencoders permite capturar relaciones no lineales entre las variables, algo que no lograría PCA o clustering directo sobre las variables crudas.
+
+- Algoritmos de clustering robustos (DBSCAN, GMM) permiten manejar grupos de diferente densidad o forma, y descubrir estructuras más flexibles.
+- 
+Visualizaciones con t-SNE / UMAP ayudan a validar de forma cualitativa si los clusters encontrados tienen sentido semántico.
+
+## 4. Desafíos potenciales
+
+Al aplicar aprendizaje no supervisado a este dataset se pueden presentar las siguientes dificultades:
+
+### Variables mixtas (numéricas y categóricas)
+No es trivial definir una métrica de distancia consistente entre variables categóricas (p.ej., “grado”, “ciudad”) y numéricas (CGPA, horas de estudio). Se requiere codificación apropiada (one-hot, embeddings, target encoding) o uso de distancias mixtas (como Gower).
+
+### Datos faltantes / valores inexistentes
+Algunas observaciones pueden tener variables faltantes (por ejemplo, no responder “historial familiar” o “estrés financiero”). Es necesario decidir cómo imputar, eliminar o modelar esos valores faltantes sin sesgar el clustering.
+
+### Escalado y normalización
+Las variables numéricas pueden tener escalas muy distintas (CGPA de 0–4, horas de estudio de 0–24, estrés de 1–10, etc.). Si no se normalizan, las variables con mayor escala dominarán la medida de distancia.
+
+### Selección del número de clusters y parámetros
+Elegir el número óptimo de clusters (para K-means o GMM), parámetros de densidad para DBSCAN, o el tamaño de la capa latente del autoencoder, es desafiante en un contexto no supervisado. Se debe recurrir a métricas internas (silhouette, Davies–Bouldin, calinski-harabasz) y validación visual.
+
+### Interpretabilidad de los clusters
+Una vez obtenidos los grupos, comprender qué variables los distinguen (por ejemplo, si un cluster tiene estudiantes con bajo sueño y alto estrés financiero) requerirá análisis estadístico de distribución por cluster, pruebas de hipótesis, y posiblemente validación experta en psicología.
+
+### Sesgo de muestreo / representatividad
+El dataset puede estar sesgado en términos de demografía (género, región, nivel socioeconómico). Los clusters pueden reflejar esos sesgos en lugar de patrones reales de depresión.
+
+### Overfitting del embedding / embedding no generalizable
+Si el autoencoder se entrena demasiado entresobreajustado a los datos de entrenamiento, el embedding puede captar ruido específico del dataset que no generaliza bien a nuevos estudiantes.
+
+### Complejidad computacional
+Si el número de estudiantes y variables es elevado, entrenar autoencoders, calcular distancias entre instancias o realizar clustering puede ser costoso en memoria y tiempo. Puede requerir técnicas de mini-batching, muestreo o reducción previa de dimensionalidad.
+
+### Validación sin etiquetas
+En aprendizaje no supervisado no se dispone de una “verdadera” etiqueta que valide los clusters. Las métricas usadas son internas y no garantizan que los clusters sean significativos desde el punto de vista del dominio (psicológico). Se necesitará validación cualitativa con expertos.
