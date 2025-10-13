@@ -49,13 +49,13 @@ https://www.kaggle.com/datasets/tentotheminus9/religious-and-philosophical-texts
 
 # Resumen 
 
-# ** https://www.kaggle.com/datasets/emmarex/plantdisease **
+# https://www.kaggle.com/datasets/emmarex/plantdisease **
 
-1. Resumen del dataset
+## 1. Resumen del dataset
 
 El conjunto de datos “PlantVillage / PlantDisease” contiene imágenes de hojas de plantas, con distintas enfermedades o estados saludables. Cada imagen está etiquetada con la clase correspondiente (por ejemplo, planta saludable, o enfermedad específica). Las clases incluyen múltiples tipos de patologías foliares en cultivos comunes (por ejemplo, tomate, papa, etc.) y también clases de hojas sanas. El dataset cuenta con un número considerable de instancias (varias decenas de miles de imágenes) y múltiples clases categóricas. Dado que se trata de un dataset visual, las variables son pixeles (canales RGB) y las clases son etiquetas nominales. El propósito original suele estar orientado al reconocimiento automático de enfermedades en plantas mediante modelos de clasificación supervisada (visión por computador).
 
-2. Problemas del mundo real que podrías abordar con aprendizaje no supervisado
+## 2. Problemas del mundo real que podrías abordar con aprendizaje no supervisado
 
 Aunque el dataset fue concebido con un enfoque supervisado (diagnóstico de enfermedades), hay varias aplicaciones interesantes para aprendizaje no supervisado:
 
@@ -69,7 +69,7 @@ Aprendizaje de representaciones no etiquetadas: usar autoencoders o técnicas de
 
 Estos enfoques pueden ayudar a los investigadores o agricultores a descubrir patrones desconocidos, diagnosticar síntomas emergentes o preparar sistemas de monitoreo que no dependan enteramente de etiquetas humanas.
 
-3. Técnicas de aprendizaje no supervisado recomendadas y su justificación
+## 3. Técnicas de aprendizaje no supervisado recomendadas y su justificación
 
 Dadas las características del dataset (datos de imagen, alta dimensionalidad, clases múltiples, posibilidad de nuevos patrones), las siguientes técnicas serían apropiadas:
 
@@ -93,7 +93,7 @@ Algoritmos como DBSCAN o HDBSCAN permiten encontrar grupos de densidad arbitrari
 
 t-SNE / UMAP son herramientas excelentes para visualización de alta dimensión en espacios bajos, facilitando la interpretación del espacio latente.
 
-4. Desafíos potenciales
+## 4. Desafíos potenciales
 
 Al trabajar con este dataset en un contexto no supervisado, surgen varios desafíos que es importante anticipar:
 
