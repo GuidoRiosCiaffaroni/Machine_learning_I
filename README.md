@@ -97,28 +97,28 @@ t-SNE / UMAP son herramientas excelentes para visualización de alta dimensión 
 
 Al trabajar con este dataset en un contexto no supervisado, surgen varios desafíos que es importante anticipar:
 
-Alta dimensionalidad / curse of dimensionality
+### Alta dimensionalidad / curse of dimensionality
 Las imágenes tienen miles o millones de dimensiones (pixeles), lo que complica que los algoritmos de clustering funcionen directamente en ese espacio (distancias pueden volverse poco informativas). Se requiere reducción de dimensionalidad o extracción de características antes de aplicar clustering.
 
-Datos faltantes / imágenes corruptas
+### Datos faltantes / imágenes corruptas
 Algunas imágenes pueden estar dañadas, incompletas o con artefactos. Esto puede afectar la calidad de embeddings o provocar errores en entrenamiento de autoencoders. Será necesario filtrar, limpiar o imputar estos casos.
 
-Desbalance de clases / desigualdad de frecuencias
+### Desbalance de clases / desigualdad de frecuencias
 Si algunas enfermedades tienen muchas más imágenes que otras, los clusters dominantes pueden estar sesgados hacia clases mayoritarias, dejando grupos menores menos bien capturados. Esto puede llevar a que agrupaciones de enfermedades raras sean absorbidas por clusters mayores.
 
-Selección de número de clusters y parámetros
+### Selección de número de clusters y parámetros
 Métodos como K-means requieren decidir k. Elegir el número óptimo de clusters en un entorno no supervisado es un desafío (usar métricas de validación como silhouette, Davies–Bouldin, etc.). En DBSCAN, elegir los parámetros de densidad (ε, min_samples) es crítico y dependiente del dataset.
 
-Interpretabilidad de los clusters
+### Interpretabilidad de los clusters
 Una vez obtenidos clusters, interpretar qué representan (¿subtipos de enfermedad? ¿errores de imagen?) no es trivial. Puede requerir inspección manual experta y validación biológica.
 
-Complejidad computacional / recursos de hardware
+### Complejidad computacional / recursos de hardware
 El entrenamiento de autoencoders convolucionales o de grandes modelos de embedding puede exigir GPU, memoria considerable y tiempo de cómputo. Si el dataset es muy grande, puede requerir estrategias de muestreo, mini-batching o técnicas de entrenamiento escalable.
 
-Ruido y variabilidad en imagen
+### Ruido y variabilidad en imagen
 Las imágenes pueden tener variaciones de iluminación, ángulos de captura, fondo, escala o rotación. Ese ruido puede dificultar la convergencia del modelo de representación latente o inducir clusters basados en artefactos en lugar de en características patológicas reales.
 
-Sesgo de muestreo / generalización
+### Sesgo de muestreo / generalización
 El dataset puede estar sesgado hacia ciertas regiones geográficas, condiciones de cultivo o especies específicas. Los clusters latentes pueden capturar sesgos en lugar de patrones universales.
 
 
