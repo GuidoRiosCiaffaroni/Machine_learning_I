@@ -384,3 +384,214 @@ Si el número de estudiantes y variables es elevado, entrenar autoencoders, calc
 
 ### Validación sin etiquetas
 En aprendizaje no supervisado no se dispone de una “verdadera” etiqueta que valide los clusters. Las métricas usadas son internas y no garantizan que los clusters sean significativos desde el punto de vista del dominio (psicológico). Se necesitará validación cualitativa con expertos.
+
+
+## https://www.kaggle.com/code/mahdimashayekhi/predicting-disease-risk-from-daily-habits/input
+
+## 1. Resumen del dataset
+
+El dataset utilizado en el proyecto “Predicting Disease Risk from Daily Habits” recopila información de individuos sobre hábitos diarios (como actividad física, alimentación, sueño, consumo de tabaco o alcohol, hábitos de higiene, patrón de dieta, etc.) y factores demográficos (edad, género, posiblemente ubicación). Adicionalmente incluye indicadores de riesgo de enfermedades (por ejemplo, presencia o probabilidad de desarrollar ciertas enfermedades crónicas). En consecuencia, es un conjunto de datos tabular con variables mixtas (numéricas, categóricas, posiblemente ordinales). El objetivo original del notebook es predecir el riesgo de enfermedad (supervisado). Sin embargo, aquí lo analizamos desde la perspectiva del aprendizaje no supervisado.
+
+## 2. Problemas del mundo real que podrías resolver con aprendizaje no supervisado
+
+Aunque la proposición original del proyecto es de predicción supervisada, el dataset también admite aplicaciones valiosas bajo enfoque no supervisado, tales como:
+
+- Segmentación de estilo de vida saludable / riesgo: agrupar individuos con patrones de hábitos similares para identificar perfiles de riesgo (por ejemplo, un grupo con mala alimentación + poco sueño; otro con actividad moderada pero consumo de tabaco, etc.).
+
+- Detección de individuos atípicos: señales de hábitos muy inusuales o extremos que podrían requerir atención especial médica o psicológica (por ejemplo, consumo extremo, insomnio severo).
+
+- Descubrimiento de factores latentes de riesgo: identificar combinaciones latentes de hábitos subyacentes que expliquen gran parte de la variabilidad en riesgo de enfermedades (por ejemplo un “factor de estilo de vida cardiovascular”).
+
+- Preprocesamiento para aprendizaje semi-supervisado: usar la estructura de agrupamiento para guiar un modelo supervisado con pocas etiquetas (etiquetar sólo algunos grupos).
+
+- Visualización de espacios de hábitos humanos: proyectar los datos en espacios reducidos para mostrar la distribución de hábitos entre la población, observar zonas densas vs zonas escasas de comportamiento.
+
+Estas aplicaciones pueden asistir a autoridades de salud pública, aseguradoras o programas de prevención a diseñar intervenciones personalizadas según perfiles de hábito.
+
+## 3. Técnicas de aprendizaje no supervisado recomendadas y su justificación
+
+Dado que el dataset es tabular, con variables mixtas, y potencialmente grandes dimensiones de hábito, las técnicas siguientes resultan apropiadas:
+
+- Autoencoders densos / autoencoders variacionales
+Un autoencoder construye una representación latente comprimida de los hábitos, que captura relaciones no lineales entre variables. Un Variational Autoencoder (VAE) puede además dotar de estructura al espacio latente (distribución continua) y facilitar la detección de anomalías (puntos en regiones de baja densidad).
+
+- Clustering sobre el embedding latente
+Después de aprender un embedding para cada individuo, aplicar algoritmos de clustering como K-means, Gaussian Mixture Models (GMM), DBSCAN o HDBSCAN para agrupar perfiles de hábito.
+
+- - K-means es eficiente y simple si se supone que hay unos pocos grupos ampliamente diferenciables.
+
+- - GMM permite modelar grupos con diferente forma, covarianza y densidad.
+
+- - DBSCAN / HDBSCAN pueden identificar grupos densos arbitrarios y separar outliers sin necesidad de conocer el número de clusters de antemano.
+
+- Clustering de mezcla probabilística (mixture models)
+Un modelo de mezcla (por ejemplo GMM) puede asignar probabilidades de pertenencia a cada grupo, lo que ayuda en los casos donde individuos están entre dos perfiles de riesgo.
+
+- PCA / t-SNE / UMAP para visualización
+
+- - PCA para reducción lineal inicial del espacio de hábitos, entender qué variables explican más varianza.
+
+- - t-SNE / UMAP para proyectar los embeddings en 2D/3D y visualizar agrupamientos, detectar solapamientos y zonas intermedias de riesgo.
+
+- Clustering jerárquico
+Aplicado ya sea en el espacio de variables transformadas o en embeddings, para generar una jerarquía de perfiles (por ejemplo, hábitos muy saludables → intermedios → de alto riesgo) con divisiones progresivas.
+
+Justificación técnica:
+
+- Las variables mixtas (numéricas y categóricas) dificultan aplicar directamente distancias euclídeas. Aprendizajes latentes permiten mapear esos datos a un espacio continuo homogéneo.
+
+- Autoencoders capturan relaciones no lineales entre hábitos (por ejemplo, correlaciones complejas entre dieta, sueño y actividad física).
+
+- Clustering en el espacio latente es más efectivo que directamente en el espacio original.
+
+- Métodos probabilísticos (GMM) o densidad (DBSCAN) ofrecen flexibilidad en la forma de los grupos y detección de anomalías.
+
+- Reducciones como t-SNE / UMAP ayudan a validar visualmente la calidad del clustering y a interpretar los resultados.
+
+## 4. Desafíos potenciales
+
+Al aplicar aprendizaje no supervisado a este tipo de dataset, se enfrentarán los siguientes retos:
+
+### Variables mixtas (numéricas, categóricas, ordinales)
+Definir una métrica de distancia coherente para todos los tipos de variable es complejo. Se requerirá codificación adecuada (one-hot, embeddings de categorías, ordinal encoding) o usar distancias mixtas como la distancia de Gower.
+
+### Datos faltantes / valores ausentes
+Es probable que algunos encuestados no respondan ciertas preguntas de hábitos diarios. Imputar estos datos sin introducir sesgos es crucial para evitar que distorsionen el clustering.
+
+### Escalado y normalización
+Las variables numéricas pueden tener rangos muy distintos (por ejemplo: horas de sueño entre 0 y 24, frecuencia de ejercicio semanal entre 0 y 7). Sin normalización, algunas variables dominarán la distancia en el espacio.
+
+### Elección del tamaño latente / arquitectura del autoencoder
+Si el embedding tiene demasiadas dimensiones, el clustering puede no simplificar nada; si es demasiado pequeño, se puede perder información relevante. Ajustar arquitectura y regularización es esencial.
+
+### Selección del número de clusters / parámetros de clustering
+Decidir el número óptimo de clusters (para K-means / GMM) o parámetros de densidad (para DBSCAN) es difícil en ausencia de etiquetas. Será preciso usar métricas internas (silhouette, Davies–Bouldin, etc.) y validación experta.
+
+### Interpretabilidad de los clusters
+Una vez definidos los perfiles de hábito, será necesario interpretar qué variables destacan en cada cluster (por ejemplo, “alta actividad + buen sueño” vs “sedentarismo + mala dieta”) mediante análisis estadísticos por grupo. Si los clusters son muy abstractos, pueden carecer de utilidad práctica.
+
+### Sesgo de muestreo / representatividad del dataset
+Si la base de datos está sesgada (por edad, género, región geográfica, nivel socioeconómico), los perfiles descubiertos pueden reflejar esos sesgos en lugar de patrones universales aplicables.
+
+### Outliers e individuos extremos
+Personas con hábitos extremos pueden distorsionar la agrupación general. Se necesita detección de outliers para que no deformen los centros de clusters.
+
+### Complejidad computacional
+Entrenar autoencoders, calcular distancias entre muchas instancias en espacio latente y hacer clustering con alta cardinalidad puede demandar memoria, tiempo de cómputo y posiblemente uso de GPU. Para grandes volúmenes de datos, pueden requerirse técnicas de muestreo o mini-batch.
+
+### Evaluación sin etiquetas reales
+En aprendizaje no supervisado no existe una etiqueta de referencia segura para evaluar directamente la “bondad” del clustering. Se debe combinar métricas internas con validación cualitativa por expertos en salud o epidemiología para asegurar que los perfiles de riesgo identificados sean clínicamente relevantes.
+
+## https://www.kaggle.com/datasets/athirags/car-data
+
+## 1. Resumen del dataset
+
+El dataset Car Data contiene registros de automóviles con varias características relevantes para compraventa. Según el análisis de usuarios, tiene 9 columnas y 301 observaciones. 
+
+
+Las variables incluyen:
+
+- Car_Name (nombre o marca/modelo del auto)
+
+- Year (año de fabricación)
+
+- Selling_Price (precio de venta)
+
+- Present_Price (precio actual de lista)
+
+- Kms_Driven (kilómetros recorridos)
+
+- Fuel_Type (tipo de combustible, por ejemplo petrol / diesel / CNG)
+
+- Seller_type (tipo de vendedor: concesionario vs individual)
+
+- Transmission (manual / automático)
+
+- Owner (número de propietarios anteriores) 
+
+
+
+Este dataset es tabular, con variables numéricas y categóricas, y está orientado al análisis de precios de automóviles en función de múltiples atributos.
+
+## 2. Problemas del mundo real que podrías resolver con aprendizaje no supervisado
+
+Aunque lo típico con este tipo de datos es aplicar regresión o predicción de precio (aprendizaje supervisado), desde la perspectiva del aprendizaje no supervisado pueden plantearse aplicaciones valiosas:
+
+Segmentación de automóviles por perfil: agrupar autos según características similares (kilometraje, precio, tipo de combustible, año). Esto permite identificar “clusters” de automóviles con perfiles de mercado semejantes (por ejemplo autos relativamente nuevos de bajo kilometraje, autos antiguos de alto kilometraje, autos de combustible económico, etc.).
+
+- Detección de automóviles atípicos: identificar instancias que difieren mucho de los grupos dominantes (por ejemplo autos extremadamente baratos o caros, muy pocos propietarios, kilómetros anómalos) que podrían ser errores de registro, estafas o casos especiales.
+
+- Reducción de dimensionalidad / visualización del espacio de automóviles: proyectar los datos en un espacio latente de menor dimensión para explorar la estructura del mercado automotriz y ver relaciones entre atributos (por ejemplo ver cómo se agrupan por año vs kilometraje vs tipo de combustible).
+
+- Creación de “clusters de oferta” para estrategias de mercado: concesionarias o portales de venta pueden usar los clusters para definir segmentos de oferta, categorización automática de autos o agrupamientos de precios en el inventario.
+
+- Generación de características latentes para modelado supervisado posterior: usar embeddings o representaciones latentes (no supervisadas) como insumo para modelos de predicción de precio o demanda, reduciendo la dependencia directa de todas las variables originales.
+
+## 3. Técnicas de aprendizaje no supervisado recomendadas y su justificación
+
+Dado el tipo de datos (tabulares con variables mixtas), las siguientes técnicas serían apropiadas:
+
+- Autoencoders (densos / redes neuronales)
+Un autoencoder configurado para datos tabulares puede aprender una representación compacta del automóvil, combinando variables numéricas y codificaciones de variables categóricas. La capa latente servirá como embedding que resume la información relevante de cada instancia.
+
+- Clustering sobre embeddings
+Una vez obtenidos los embeddings, aplicar algoritmos de clustering como K-means, GMM (Gaussian Mixture Models), DBSCAN o HDBSCAN para agrupar automóviles de perfil similar.
+
+- - K-means es sencillo y eficiente si se espera un número moderado de clusters.
+
+- - GMM permite capturar clusters con diferente forma/distribución de covarianza.
+
+- - DBSCAN / HDBSCAN pueden detectar clusters densos y aislar outliers sin necesidad de definir el número de clusters de antemano.
+
+- PCA / t-SNE / UMAP
+
+- - PCA para hacer una reducción lineal inicial y entender qué proporción de la varianza pueden explicar las primeras componentes.
+
+- - t-SNE o UMAP para proyectar los embeddings o los datos transformados en 2D/3D y visualizar agrupamientos, solapamientos y patrones latentes (por ejemplo, ver si autos de diferente transmisión se separan claramente).
+
+- Clustering jerárquico (aglomerativo / divisivo)
+Permite construir una jerarquía de agrupamiento basada en similitudes, lo cual puede revelar subdivisiones progresivas: por ejemplo separar primero por tipo de combustible, luego dentro de cada grupo por años, etc.
+
+- Modelos de mezcla probabilística
+GMM (o mezclas gaussianas) también puede ser especialmente útil para asignar probabilidades de pertenencia a clusters en lugar de asignaciones duras, lo que es útil cuando un auto “está entre” dos perfiles.
+
+Justificación técnica:
+
+- Los datos mixtos (numéricos y categóricos) no permiten aplicar directamente distancias euclídeas sin transformación. Usar embeddings aprendidos facilita mapear esos datos a un espacio continuo homogéneo.
+
+- Clustering en el espacio latente suele producir agrupamientos más coherentes que en el espacio original, pues se han eliminado redundancias y ruido.
+
+- Métodos probabilísticos o de densidad permiten flexibilidad en la forma de los clusters y la identificación de outliers.
+
+- PCA / t-SNE / UMAP ayudan no solo en visualización sino también en validar si los clusters encontrados tienen sentido estructural en el espacio de atributos.
+
+## 4. Desafíos potenciales
+
+Al aplicar aprendizaje no supervisado con este dataset, se enfrentan varios retos:
+
+### Variables mixtas (numéricas y categóricas)
+Las variables como Fuel_Type, Seller_type, Transmission, Owner son categóricas o ordinales y requieren codificación (one-hot, embeddings, target encoding) para que el algoritmo de clustering las pueda integrar. Si la codificación no es adecuada, puede inducir distorsiones en la medida de similitud.
+
+### Escalado y normalización
+Variables numéricas (por ejemplo, Present_Price, Kms_Driven) tienen escalas muy diferentes. Si no se normalizan (por ejemplo mediante estandarización o normalización min-max), aquellas con magnitud mayor dominarán la distancia.
+
+### Datos faltantes / valores nulos
+Aunque no está muy documentado, puede haber registros incompletos. Deberá decidirse cómo imputar o eliminar esos casos sin introducir sesgo significativo.
+
+### Selección del número de clusters / parámetros
+En K-means se debe decidir k, en DBSCAN los parámetros de densidad (ε, min_samples), en clustering jerárquico el punto de corte. En ausencia de etiquetas verdaderas, esa elección requiere métricas internas (silhouette, Davies–Bouldin, Calinski-Harabasz) y experimentación.
+
+### Interpretabilidad de los clusters
+Una vez definidos los grupos, es necesario interpretar qué características distinguen cada cluster (por ejemplo un cluster con autos de alto kilometraje y bajo precio). Será necesario explorar estadísticas por cluster y posiblemente combinar con conocimiento del dominio automotriz.
+
+### Outliers y casos extremos
+Autos con valores extremos (muchos kilómetros, precios muy bajos o muy altos) pueden distorsionar la formación de clusters. Sería aconsejable detectar y posiblemente excluir o tratar esos outliers antes de clustering.
+
+### Tamaño del dataset / densidad de muestra
+Con 301 instancias, el dataset es relativamente pequeño. Eso puede limitar la robustez de clustering, hacer más sensible la elección de parámetros e incrementar la variabilidad en los resultados. Los clusters pueden no ser muy estables con datos tan escasos.
+
+### Sobreajuste del embedding / embedding no generalizable
+Si el autoencoder se ajusta muy rígidamente al dataset disponible, puede capturar ruido en lugar de patrones generales, lo que da embeddings poco útiles para new instances (autos no vistos).
+
+### Evaluación sin etiquetas verdaderas
+Dado que el enfoque es no supervisado, no hay una “verdadera” asignación de cluster contra la cual comparar. Se dependerá de métricas internas y de validación cualitativa (inspección visual, sentido del dominio) para decidir si los clusters son útiles.
