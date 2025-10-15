@@ -595,3 +595,93 @@ Si el autoencoder se ajusta muy rígidamente al dataset disponible, puede captur
 
 ### Evaluación sin etiquetas verdaderas
 Dado que el enfoque es no supervisado, no hay una “verdadera” asignación de cluster contra la cual comparar. Se dependerá de métricas internas y de validación cualitativa (inspección visual, sentido del dominio) para decidir si los clusters son útiles.
+
+## https://www.kaggle.com/datasets/tentotheminus9/religious-and-philosophical-texts
+
+## 1. Resumen del dataset
+
+El dataset “Religious and Philosophical Texts” contiene cinco textos completos provenientes de Project Gutenberg, con contenido religioso y filosófico. Cada texto es un documento de longitud variable (miles de palabras), con lenguaje natural en forma de oraciones y párrafos. Las variables formales del dataset son principalmente el contenido textual (secuencias de tokens, oraciones, párrafos), con metadatos mínimos (título del texto, autor, identificador). El propósito original del conjunto es fomentar el análisis de texto, minería de opiniones, semántica, y procesamiento del lenguaje natural (NLP) en contextos religiosos y filosóficos.
+
+## 2. Problemas del mundo real que podrías resolver con aprendizaje no supervisado
+
+Aunque el dataset no está diseñado específicamente para tareas supervisadas, aplicar aprendizaje no supervisado puede ayudar a resolver múltiples desafíos prácticos:
+
+- Detección de temas latentes (topic modeling): descubrir los temas filosóficos o religiosos subyacentes en los textos sin especificar etiquetas (por ejemplo, moral, existencia, fe, ética).
+
+- Clustering de secciones textuales similares: segmentar capítulos, párrafos u oraciones en grupos con contenido semántico parecido (por ejemplo, partes con tono narrativo vs partes argumentativas).
+
+- Reducción de dimensionalidad para visualización semántica: proyectar representaciones de secciones o oraciones en espacios de baja dimensión para explorar similitudes semánticas y relaciones cruzadas entre los textos.
+
+- Detección de anomalías o pasajes atípicos: identificar fragmentos que divergen mucho del estilo o contenido dominantes (por ejemplo, interpolaciones, anotaciones, errores de digitalización).
+
+- Construcción de embeddings semánticos no supervisados: aprender representaciones latentes de oraciones o párrafos que sirvan como insumo para tareas posteriores (por ejemplo, clasificación, búsqueda semántica, recomendación).
+
+- Mapeo comparativo entre autores / textos: comparar estilos, similitudes temáticas o diferencias semánticas entre los textos desde una perspectiva no supervisada.
+
+Estas aplicaciones pueden servir a estudios literarios, lingüísticos, filosóficos o de teología, permitiendo descubrir estructuras latentes, relaciones entre textos, o variaciones temáticas sin depender de anotaciones humanas previas.
+
+## 3. Técnicas de aprendizaje no supervisado recomendadas y su justificación
+
+Dada la naturaleza textual del dataset (lenguaje natural, secuencias de tokens largos, vocabulario extenso), las siguientes técnicas son apropiadas:
+
+- Modelos de tema (Topic Modeling) — LDA, NMF, LDA2Vec
+Estos métodos permiten extraer temas (distribuciones de palabras) latentes que coocurren en los textos. LDA (Latent Dirichlet Allocation) es clásico para descubrir tópicos no supervisados. NMF (Factorización de No Negativos) puede dar representaciones aditivas de tópicos. LDA2Vec combina embeddings de palabras con modelado de tópicos.
+
+- Word Embeddings / Sentence Embeddings no supervisados
+Técnicas como Word2Vec (skip-gram / CBOW), GloVe o embeddings contextuales (por ejemplo entrenar BERT o usar BERT sin supervisión) permiten mapear palabras, oraciones o párrafos en vectores semánticos. Luego esos vectores pueden usarse para clustering o reducción de dimensionalidad.
+
+- Clustering de embeddings
+Una vez que cada oración, párrafo o sección tenga un embedding, se pueden aplicar algoritmos como K-means, GMM, DBSCAN, HDBSCAN, o clustering jerárquico para agrupar fragmentos con contenido semántico similar.
+
+- Reducción de dimensionalidad (PCA, t-SNE, UMAP, PCA sobre embeddings)
+Para visualizar relaciones semánticas entre fragmentos de texto: por ejemplo proyectar embeddings a 2D con t-SNE o UMAP para observar cómo se agrupan las oraciones de distintos textos, si hay solapamientos temáticos, etc.
+
+- Modelos autoencoder para textos
+Se pueden emplear autoencoders basados en modelos de lenguaje (por ejemplo autoencoders secuenciales, Variational Autoencoders aplicados a embeddings) para aprender representaciones latentes comprimidas de oraciones o párrafos, y luego agrupar sobre ese espacio latente.
+
+- Modelos de mezcla probabilística sobre embeddings
+Al aplicar GMM u otros modelos de mezcla, se puede obtener no solo agrupamiento sino probabilidades de pertenencia a múltiples temas o clusters para cada fragmento, útil cuando un fragmento mezcla conceptos.
+
+Justificación técnica:
+
+- El texto es de alta dimensionalidad en el espacio de vocabulario (muchas palabras distintas), por lo que un clustering directo en el espacio de conteo o bag-of-words sería ruidoso o dominado por palabras de alta frecuencia poco informativas.
+
+- Modelos de tema y embeddings reducen la dimensionalidad y capturan relaciones semánticas latentes.
+
+- Clustering sobre embeddings permite detectar agrupamientos semánticos más robustos que los basados en conteos puros.
+
+- Técnicas de reducción como UMAP / t-SNE facilitan la visualización de la estructura semántica latente.
+
+## 4. Desafíos potenciales
+
+Al aplicar aprendizaje no supervisado a este dataset textual, surgen varios retos:
+
+### Gran dimensionalidad del vocabulario / sparsity
+El espacio de palabras posibles es muy amplio y muchas aparecen pocas veces. Modelos de conteo (bag-of-words) serán esparsos y poco efectivos sin técnicas de reducción.
+
+### Preprocesamiento del texto
+Es preciso limpiar el texto (eliminar caracteres especiales, normalización, lematización o stemming, eliminación de “stop words”). Preprocesamientos inadecuados pueden inducir ruido o perder semántica.
+
+### Selección del nivel de fragmentación
+Decidir si trabajar a nivel de palabras, oraciones, párrafos o capítulos afecta las representaciones y los clusters resultantes. Un nivel muy granular puede advertir demasiado ruido, muy agregado puede perder detalle.
+
+### Elección de número de temas / clusters / dimensión latente
+En LDA se debe decidir el número de temas; en clustering elegir el número de clusters o parámetros de densidad; en autoencoder decidir la dimensión del embedding. Estas decisiones no son triviales sin supervisión.
+
+### Interpretabilidad de los temas o clusters
+Traducir un tópico (distribución de palabras) o cluster (fragmentos agrupados) en una interpretación semántica coherente puede requerir juicio humano experto. Los resultados pueden ser vagos o difíciles de nombrar.
+
+### Estructura de dominio (autor, época, estilo literario)
+Los textos pueden diferir no solo en contenido temático sino en estilo literario (época, dicción, forma), lo que puede sesgar los clusters hacia agrupamientos estilísticos, no conceptuales.
+
+### Longitud desigual de textos / fragmentos
+Algunos textos o fragmentos pueden ser mucho más largos que otros, lo cual puede sesgar las representaciones (por ejemplo embeddings promedio de muchas oraciones vs pocas). Es importante normalizar o compensar longitud.
+
+### Overfitting del embedding / clusters poco generalizables
+Si el embedding o modelado de temas se ajusta demasiado a los 5 textos, puede capturar idiosincrasias específicas y no poder generalizar a otros textos religiosos o filosóficos.
+
+### Evaluación subjetiva / sin ground truth
+No hay etiquetas “verdaderas” de temas o agrupamientos ideales, lo que implica que la validación es en gran parte cualitativa (inspección humana, coherencia de tópicos). Las métricas internas (coherencia de tópico, similitud interna/external) ayudan, pero no garantizan interpretación útil.
+
+### Interferencia de vocabulario común / ambigüedad semántica
+Palabras comunes (por ejemplo, “Dios”, “alma”, “ser”) aparecerán en múltiples textos y tópicos, lo que puede provocar solapamientos o clusters semánticamente difusos.
